@@ -30,8 +30,15 @@ public class Application {
      * @return 应用上下文对象
      */
     public static ApplicationContext run(Class<?> clazz, String[] args) {
+        if (!clazz.isAnnotationPresent(SpringApplication.class)) {
+            log.error("{}未添加SpringApplication注解", clazz.getName());
+            return null;
+        }
+        SpringApplication annotation = clazz.getAnnotation(SpringApplication.class);
         log.info("spring应用正在启动");
-        ApplicationContext applicationContext = new ApplicationContext(clazz.getPackage().getName(), args);
+        ApplicationContext applicationContext = new ApplicationContext(clazz.getPackage().getName(),
+                annotation.exclude(),
+                args);
         log.info("{}启动完成", applicationName);
         applicationContext.getIoc().put("applicationContext", applicationContext);
         return applicationContext;

@@ -1,5 +1,6 @@
 package com.tapirheron.spring.framework;
 
+import com.tapirheron.spring.framework.properties.Configuration;
 import com.tapirheron.spring.framework.properties.Value;
 import lombok.Data;
 import java.lang.reflect.Constructor;
@@ -33,9 +34,18 @@ public class BeanDefinition {
      * @param aClass Bean对应的类
      */
     public BeanDefinition(Class<?> aClass) {
-        this.beanName = aClass.getAnnotation(Componet.class).name().isEmpty() ?
-                Character.toLowerCase(aClass.getSimpleName().charAt(0)) + aClass.getSimpleName().substring(1) :
-                aClass.getAnnotation(Componet.class).name();
+        if (aClass.isAnnotationPresent(Componet.class)) {
+            this.beanName = aClass.getAnnotation(Componet.class).name().isEmpty() ?
+                    Character.toLowerCase(aClass.getSimpleName().charAt(0)) + aClass.getSimpleName().substring(1) :
+                    aClass.getAnnotation(Componet.class).name();
+        }else if (aClass.isAnnotationPresent(Configuration.class)) {
+            this.beanName = aClass.getAnnotation(Configuration.class).name().isEmpty() ?
+                    Character.toLowerCase(aClass.getSimpleName().charAt(0)) + aClass.getSimpleName().substring(1) :
+                    aClass.getAnnotation(Configuration.class).name();
+        } else {
+            this.beanName = Character.toLowerCase(aClass.getSimpleName().charAt(0)) + aClass.getSimpleName().substring(1);
+
+        }
         this.beanType = aClass;
         try {
             this.constructor = aClass.getConstructor();

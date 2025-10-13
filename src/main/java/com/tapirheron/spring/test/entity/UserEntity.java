@@ -4,7 +4,7 @@ import com.tapirheron.spring.dao.Column;
 import com.tapirheron.spring.dao.Table;
 import lombok.Data;
 
-@Table(tableName = "test")
+@Table(tableName = "user")
 @Data
 public class UserEntity {
     @Column(columnName = "id")

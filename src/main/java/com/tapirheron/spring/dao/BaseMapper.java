@@ -13,9 +13,8 @@ import java.util.Map;
 @Mapper
 public interface BaseMapper<T> {
 
-    UserEntity executeQuery(String sqlQuery);
+    T executeQuery(String sqlQuery);
 
-    List<UserEntity> executeQueryList(String sqlQuery);
     /**
      * 获取字段map
      * @param t

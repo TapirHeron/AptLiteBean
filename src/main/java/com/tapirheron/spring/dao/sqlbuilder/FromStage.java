@@ -1,6 +1,8 @@
 package com.tapirheron.spring.dao.sqlbuilder;
 
-public interface FromStage {
+public interface
+
+FromStage {
    WhereStage from(String table);
 
 }

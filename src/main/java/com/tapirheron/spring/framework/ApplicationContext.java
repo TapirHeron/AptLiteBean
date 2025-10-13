@@ -78,6 +78,10 @@ public class ApplicationContext {
      */
     private final String packageName;
 
+    /**
+     * 排除的类的名字
+     */
+    private final List<String> excludeClassName;
 
     /**
      * 构造函数，初始化应用上下文
@@ -86,19 +90,24 @@ public class ApplicationContext {
      * @param args        启动参数
      */
     @SuppressWarnings("all")
-    public ApplicationContext(String packageName, String[] args) {
+    public ApplicationContext(String packageName, Class[] excludeClass, String[] args) {
         ioc = new HashMap<>();
         loadingIoc = new HashMap<>();
         beanDefinitionMap = new HashMap<>();
         beanPostProcessors = new ArrayList<>();
         configValueMap = new HashMap<>();
         this.packageName = packageName;
+        this.excludeClassName = List.of(excludeClass)
+                .stream()
+                .map(Class::getName)
+                .toList();
         /* 添加ApplicationContext实例到loadingIOC容器中,
         不放在ioc中是因为优先读取laodingIoc,
         以防在ioc还没初始化完成之前，
         有bean依赖applicationContext(如dispatcherServlet)
          */
         loadingIoc.put("applicationContext", this);
+        loadConfigValueMap();
         initContext("com.tapirheron.spring");
         initMapper(packageName);
         initMapper("com.tapirheron.spring");
@@ -138,12 +147,11 @@ public class ApplicationContext {
      * @param packageName 包名
      */
     private void initContext(String packageName) {
-        loadConfigValueMap();
-        scanPackage(packageName).stream()
-                .peek(this::initConfigurationProperties)
-                .peek(this::initConfigurationBean)
+        List<Class<?>> classes = scanPackage(packageName);
+        classes.stream()
                 .filter(this::canCreateBean)
                 .forEach(this::wrapperBean);
+        classes.forEach(this::initConfigurationBean);       // 初始化配置类
         initBeanPostProcessors();
         beanDefinitionMap.values()
                 .stream()
@@ -163,50 +171,17 @@ public class ApplicationContext {
                     return 0;
                 })
                 .forEach(this::createBean);
-
     }
 
-    private <T> void initConfigurationProperties(Class<T> aClass) {
+    private <T> T initConfigurationProperties(Class<T> aClass) {
         if (!aClass.isAnnotationPresent(ConfigurationProperties.class)) {
-            return;
+            return null;
         }
         T o = null;
         try {
             o = aClass.getConstructor().newInstance();
         } catch (Exception ignore) {}
-        ConfigurationProperties annotation = aClass.getAnnotation(ConfigurationProperties.class);
-        String prefix = annotation.prefix();
-        T finalO = o;
-
-        Arrays.stream(aClass.getDeclaredFields())
-                .peek(field -> {
-                    field.setAccessible(true);
-                    String key = prefix.concat(".")
-                            .concat(doFieldNameToConfigPropertiesName(field.getName()));
-                    String value = configValueMap.get(key);
-                    if (value == null) {
-                        return;
-                    }
-                    if (field.getType().equals(int.class)) {
-                        try {
-                            field.set(finalO, Integer.parseInt(value));
-                            return;
-                        } catch (IllegalAccessException ignore) {}
-                    }
-                    if (field.getType().equals(float.class)) {
-                        try {
-                            field.set(finalO, Float.parseFloat(value));
-                            return;
-                        } catch (IllegalAccessException ignore) {}
-                    }
-                    try {
-                        field.set(finalO, value);
-                    } catch (IllegalAccessException ignore) {}
-                })
-                // 触发stream懒加载执行
-                .forEach(field -> {});
-        ioc.put(String.valueOf(Character.toLowerCase(aClass.getSimpleName().charAt(0)))
-                .concat(aClass.getSimpleName().substring(1)), finalO);
+        return injectConfigurationProperties(o, aClass);
     }
 
     /**
@@ -248,40 +223,55 @@ public class ApplicationContext {
         if (!aClass.isAnnotationPresent(Configuration.class)) {
             return;
         }
+
         Arrays.stream(aClass.getDeclaredMethods())
                 .filter(method -> method.isAnnotationPresent(Bean.class))
                 .forEach(method -> {
                     Bean beanAnnotation = method.getAnnotation(Bean.class);
                     String beanName = beanAnnotation.value().isEmpty() ? method.getName() : beanAnnotation.value();
-                    Object configClassInstance;
+                    // 把自己注册成bean
+                    BeanDefinition beanDefinition = wrapperBean(aClass);
+                    Object bean = createBean(beanDefinition);
+                    // 调用Bean方法
                     try {
                         if (method.getParameterCount() <= 0) {
-                            configClassInstance = aClass.getConstructor().newInstance();
                             method.setAccessible(true);
-                            Object beanInstance = method.invoke(configClassInstance);
+                            Object beanInstance = method.invoke(bean);
                             ioc.put(beanName, beanInstance);
                         } else {
                             Parameter[] parameters = method.getParameters();
                             Object[] args = new Object[parameters.length];
                             int index = 0;
                             // 传递参数
+                            List<Class<?>> enableClasses = new ArrayList<>();
+                            List<?> propertiesClassList = new ArrayList<>();
+                            if (aClass.isAnnotationPresent(EnableConfigurationProperties.class)) {
+                                enableClasses = List.of(aClass.getAnnotation(EnableConfigurationProperties.class).value());
+                                propertiesClassList = enableClasses.stream()
+                                        .map(this::initConfigurationProperties)
+                                        .toList();
+
+                            }
                             for (Parameter parameter : parameters) {
                                 Object value;
-                                if (!aClass.isAnnotationPresent(EnableConfigurationProperties.class) ||
-                                        !aClass.isAnnotationPresent(Configuration.class)) {
-                                    break;
+                                // 优先从ioc中获取
+                                if ((value = getBean(parameter.getType())) != null) {
+                                    args[index++] = value;
+                                    continue;
                                 }
-                                Class<?>[] enableClasses = aClass.getAnnotation(EnableConfigurationProperties.class).value();
-                                if (Arrays.asList(enableClasses).contains(parameter.getType()) && (value = getBean(parameter.getType())) != null) {
+                                if (enableClasses.contains(parameter.getType())) {
+                                    value = propertiesClassList.get(enableClasses.indexOf(parameter.getType()));
                                     args[index++] = value;
                                 }
                             }
-                            configClassInstance = aClass.getConstructor().newInstance();
                             method.setAccessible(true);
-                            Object beanInstance = method.invoke(configClassInstance, args);
+                            Object beanInstance = method.invoke(bean, args);
                             ioc.put(beanName, beanInstance);
                         }
-                    } catch (Exception ignore) {}
+
+                    } catch (Exception e) {
+                        log.error("配置类允许的类型与实际方法调用参数类型不匹配, {}", e.getMessage());
+                    }
                 });
     }
 
@@ -324,6 +314,7 @@ public class ApplicationContext {
      */
     private Object doCreateBean(BeanDefinition beanDefinition) {
         Object bean;
+        // 进行缓冲赋值，防止二次造对象
         if ((bean = getBean(beanDefinition.getBeanType())) != null) {
             // 注入配置文件属性
             injectConfigValue(beanDefinition, bean);
@@ -342,6 +333,8 @@ public class ApplicationContext {
             } catch (Exception ignore) {}
             loadingIoc.put(beanDefinition.getBeanName(), bean);
         }
+        // 注入带有ConfigurationProperties注解的类
+        injectConfigurationProperties(bean, beanDefinition.getBeanType());
 
         // 注入配置文件属性
         injectConfigValue(beanDefinition, bean);
@@ -356,6 +349,50 @@ public class ApplicationContext {
         }
         ioc.put(beanDefinition.getBeanName(), loadingIoc.remove(beanDefinition.getBeanName()));
         return bean;
+    }
+
+    /**
+     * 创建ConfigurationProperties类实例
+     *
+     * @param bean  创建的bean实例
+     * @param aClass 配置类
+     * @return 配置类实例
+     */
+    @SuppressWarnings("unchecked")
+    private <T> T injectConfigurationProperties(Object bean, Class<T> aClass) {
+        if (!aClass.isAnnotationPresent(ConfigurationProperties.class)) {
+            return null;
+        }
+        ConfigurationProperties annotation = aClass.getAnnotation(ConfigurationProperties.class);
+        String prefix = annotation.prefix();
+        Arrays.stream(aClass.getDeclaredFields())
+                .peek(field -> {
+                    field.setAccessible(true);
+                    String key = prefix.concat(".")
+                            .concat(doFieldNameToConfigPropertiesName(field.getName()));
+                    String value = configValueMap.get(key);
+                    if (value == null) {
+                        return;
+                    }
+                    if (field.getType().equals(int.class)) {
+                        try {
+                            field.set(bean, Integer.parseInt(value));
+                            return;
+                        } catch (IllegalAccessException ignore) {}
+                    }
+                    if (field.getType().equals(float.class)) {
+                        try {
+                            field.set(bean, Float.parseFloat(value));
+                            return;
+                        } catch (IllegalAccessException ignore) {}
+                    }
+                    try {
+                        field.set(bean, value);
+                    } catch (IllegalAccessException ignore) {}
+                })
+                // 触发stream懒加载执行
+                .forEach(field -> {});
+        return (T) bean;
     }
 
 
@@ -442,9 +479,13 @@ public class ApplicationContext {
      *
      * @param aClass Bean对应的类
      */
-    private void wrapperBean(Class<?> aClass) {
+    private BeanDefinition wrapperBean(Class<?> aClass) {
         BeanDefinition beanDefinition = new BeanDefinition(aClass);
-        this.beanDefinitionMap.put(beanDefinition.getBeanName(), beanDefinition);
+        if (beanDefinitionMap.containsKey(beanDefinition.getBeanName())) {
+            return beanDefinition;
+        }
+        beanDefinitionMap.put(beanDefinition.getBeanName(), beanDefinition);
+        return beanDefinition;
     }
 
     /**
@@ -514,8 +555,10 @@ public class ApplicationContext {
                     String className = entryName.replace("/", ".")
                             .substring(0, entryName.length() - 6);
                     try {
-                        Class<?> clazz = Class.forName(className);
-                        classes.add(clazz);
+                        if (excludeClassName.contains(className)) {
+                            continue;
+                        }
+                        classes.add(Class.forName(className));
                     } catch (ClassNotFoundException ignore) {}
                 }
             }
@@ -541,6 +584,9 @@ public class ApplicationContext {
                                 .substring(i, file.toString().length() - ".class".length())
                                 .replace(File.separator, ".");
                         try {
+                            if (excludeClassName.contains(className)) {
+                                return FileVisitResult.CONTINUE;
+                            }
                             classes.add(Class.forName(className));
                         } catch (ClassNotFoundException e) {
                             throw new RuntimeException(e);

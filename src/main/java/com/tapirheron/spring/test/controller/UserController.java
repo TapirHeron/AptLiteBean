@@ -1,7 +1,6 @@
 package com.tapirheron.spring.test.controller;
 
 import com.tapirheron.spring.dao.sqlbuilder.SQLQuery;
-import com.tapirheron.spring.framework.ApplicationContext;
 import com.tapirheron.spring.framework.Autowired;
 import com.tapirheron.spring.framework.Componet;
 import com.tapirheron.spring.mvc.Controller;
@@ -22,10 +21,7 @@ public class UserController {
     @Autowired
     UserMapper userMapper;
 
-    @Autowired
-    ApplicationContext applicationContext;
     @RequestMapping("/getUser")
-    @ResponseBody
     public UserEntity getUser(@Param("id") int id) {
         String sql = SQLQuery.selectBuilder()
                 .select("*")
@@ -34,7 +30,7 @@ public class UserController {
                         .where("id = " + id)
                         .build())
                 .build();
-        UserEntity o = userMapper.executeQuery(sql);
+        UserEntity o = userMapper.executeSql(sql);
         System.out.println(o);
         return o;
     }

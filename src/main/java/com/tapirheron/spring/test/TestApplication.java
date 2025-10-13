@@ -6,9 +6,10 @@ import com.tapirheron.spring.framework.SpringApplication;
 
 @SpringApplication
 public class TestApplication {
-
+    static class Animal {}
+    static class Dog extends Animal {}
     public static void main(String[] args) {
-
         ApplicationContext run = Application.run(TestApplication.class, args);
+
     }
 }

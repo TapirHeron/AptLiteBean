@@ -43,8 +43,17 @@ public class MySqlSessionFactoryInvocationHandler implements InvocationHandler {
         if (method.getReturnType() == boolean.class) {
             return executeBoolean(args[0].toString());
         }
-
         return executeSql(args[0].toString(), method, method.getReturnType());
+    }
+
+    private Class<?> getActualReturnType(Method method) {
+        Class<?> actualReturnType = method.getReturnType();
+        Type genericSuperclass = method.getDeclaringClass().getGenericInterfaces()[0];
+        if (genericSuperclass instanceof ParameterizedType parameterizedType) {
+            parameterizedType.getActualTypeArguments();
+            actualReturnType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+        }
+        return actualReturnType;
     }
 
     private boolean executeBoolean(String sql) throws Exception {
@@ -68,7 +77,8 @@ public class MySqlSessionFactoryInvocationHandler implements InvocationHandler {
             if (isContainerType(returnType)) {
                 return (T) getResults(Objects.requireNonNull(getElementClass(method)), resultSet);
             }
-            return getResult(returnType, resultSet);
+            Class<T> actualReturnType = (Class<T>) getActualReturnType(method);
+            return getResult(actualReturnType, resultSet);
         } catch (SQLException e) {
             log.error("准备SQL语句时发生异常，SQL: {}, 错误信息: {}", sql, e.getMessage());
             throw e;
@@ -103,11 +113,13 @@ public class MySqlSessionFactoryInvocationHandler implements InvocationHandler {
         for (Field field : returnType.getDeclaredFields()) {
             Object column = null;
             String name;
+            // 获取sql中的字段名
             if (field.isAnnotationPresent(Column.class) && !field.getAnnotation(Column.class).isTableExist()) {
                 name = field.getName();
             } else {
                 name = field.getAnnotation(Column.class).columnName();
             }
+            // 检查字段类型给字段赋值
             if (field.getType() == String.class) {
                 column = resultSet.getString(name);
             } else if (field.getType() == int.class) {

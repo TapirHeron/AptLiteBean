@@ -5,12 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ee44c7e5-7d26-477a-b9f1-702004954cc9" name="更改" comment="完成dao查询操作">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/dao/DatabaseConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/dao/DatabaseConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/dao/MySqlSessionFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/dao/MySqlSessionFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/dao/BaseMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/dao/BaseMapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/dao/MySqlSessionFactoryInvocationHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/dao/MySqlSessionFactoryInvocationHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/dao/sqlbuilder/FromStage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/dao/sqlbuilder/FromStage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/framework/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/framework/Application.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/framework/ApplicationContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/framework/ApplicationContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/framework/BeanDefinition.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/framework/BeanDefinition.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/framework/SpringApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/framework/SpringApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/framework/properties/Configuration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/framework/properties/Configuration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/mvc/ResponseBody.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/mvc/ResponseBody.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/test/TestApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/test/TestApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/test/config/MyProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/test/config/MyProperties.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/test/config/TestConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/test/config/TestConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/test/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/test/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/test/entity/UserEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/test/entity/UserEntity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/test/mapper/UserMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/tapirheron/spring/test/mapper/UserMapper.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -22,9 +31,9 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Enum" />
-        <option value="Interface" />
         <option value="AnnotationType" />
         <option value="Class" />
+        <option value="Interface" />
       </list>
     </option>
   </component>
@@ -60,37 +69,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Maven.spring-framwork [org.apache.maven.plugins:maven-clean-plugin:3.2.0:clean].executor": "Run",
-    "Maven.spring-framwork [org.apache.maven.plugins:maven-install-plugin:3.1.2:install].executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Tapir_Heron/Desktop/work/practice/mini-mybatis",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "模块",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "MavenSettings",
-    "vue.rearranger.settings.migration": "true",
-    "应用程序.Cat.executor": "Run",
-    "应用程序.Main.executor": "Run",
-    "应用程序.TestApplication.executor": "Run"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Maven.spring-framwork [org.apache.maven.plugins:maven-clean-plugin:3.2.0:clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.spring-framwork [org.apache.maven.plugins:maven-install-plugin:3.1.2:install].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Tapir_Heron/Desktop/work/practice/spring-framwork&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;模块&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;,
+    &quot;应用程序.Cat.executor&quot;: &quot;Run&quot;,
+    &quot;应用程序.Main.executor&quot;: &quot;Run&quot;,
+    &quot;应用程序.ReflectTest.executor&quot;: &quot;Run&quot;,
+    &quot;应用程序.TestApplication.executor&quot;: &quot;Run&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.tapirheron.spring.test" />
       <recent name="com.tapirheron.spring.test.controller" />
       <recent name="com.tapirheron.spring.mvc" />
       <recent name="sub" />
@@ -103,7 +114,20 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="应用程序.TestApplication">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.tapirheron.spring.dao.sqlbuilder.Main" />
+      <module name="spring-framwork" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.tapirheron.spring.dao.sqlbuilder.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="TestApplication" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.tapirheron.spring.test.TestApplication" />
       <module name="spring-framwork" />
@@ -111,6 +135,11 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="应用程序.Main" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -150,6 +179,16 @@
       <workItem from="1758527886386" duration="6104000" />
       <workItem from="1758536666717" duration="14492000" />
       <workItem from="1758551757823" duration="3944000" />
+      <workItem from="1758555919273" duration="124000" />
+      <workItem from="1758603081078" duration="5159000" />
+      <workItem from="1758619377261" duration="9057000" />
+      <workItem from="1758637732964" duration="2050000" />
+      <workItem from="1758673862740" duration="2373000" />
+      <workItem from="1758726288907" duration="174000" />
+      <workItem from="1758778220581" duration="94000" />
+      <workItem from="1758954987309" duration="74000" />
+      <workItem from="1760024248590" duration="245000" />
+      <workItem from="1760264667656" duration="3370000" />
     </task>
     <task id="LOCAL-00001" summary="完成dao查询操作">
       <option name="closed" value="true" />
@@ -197,7 +236,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/tapirheron/spring/dao/BaseMapper.java</url>
-          <line>105</line>
+          <line>104</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

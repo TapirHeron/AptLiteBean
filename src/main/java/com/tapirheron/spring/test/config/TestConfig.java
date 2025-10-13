@@ -1,5 +1,8 @@
 package com.tapirheron.spring.test.config;
 
+import com.tapirheron.spring.dao.MySqlSessionFactory;
+import com.tapirheron.spring.framework.ApplicationContext;
+import com.tapirheron.spring.framework.Autowired;
 import com.tapirheron.spring.framework.Bean;
 import com.tapirheron.spring.framework.properties.Configuration;
 import com.tapirheron.spring.framework.properties.EnableConfigurationProperties;
@@ -10,8 +13,12 @@ import com.tapirheron.spring.framework.properties.EnableConfigurationProperties;
  * 添加第三方类注册为bean
  */
 @Configuration
-@EnableConfigurationProperties({MyProperties.class})
+@EnableConfigurationProperties({MyProperties.class, MySecondProperties.class})
 public class TestConfig {
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
     @Bean("testBean")
     public String testBean() {
         return "test value";
@@ -27,6 +34,7 @@ public class TestConfig {
     }
     @Bean("2")
     public String testSecondProperties(MySecondProperties mySecondProperties) {
+        System.out.println(mySecondProperties.getName());
         return mySecondProperties.getName();
     }
 }
