@@ -130,7 +130,9 @@ public class DispatcherServlet extends HttpServlet implements BeanPostProcessor 
                 result = invokeMethod.invoke(handler.getControllerBean(), args);
             }
             handler.getReturnType().getReturnTypeHandler().handle(result, req, resp);
-        } catch (Exception ignore) {}
+        } catch (Exception e) {
+            log.error("方法调用异常", e);
+        }
 
     }
     private Connection getConnection() {
