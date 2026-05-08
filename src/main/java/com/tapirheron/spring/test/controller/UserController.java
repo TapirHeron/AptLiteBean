@@ -7,10 +7,10 @@ import com.tapirheron.spring.mvc.Controller;
 import com.tapirheron.spring.mvc.Param;
 import com.tapirheron.spring.mvc.RequestMapping;
 import com.tapirheron.spring.mvc.ResponseBody;
+import com.tapirheron.spring.mvc.Transactionnal;
 import com.tapirheron.spring.test.entity.UserEntity;
 import com.tapirheron.spring.test.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
-
 import java.util.List;
 
 @Slf4j
@@ -20,7 +20,7 @@ import java.util.List;
 public class UserController {
     @Autowired
     UserMapper userMapper;
-
+    @Transactionnal
     @RequestMapping("/getUser")
     public UserEntity getUser(@Param("id") int id) {
         String sql = SQLQuery.selectBuilder()
@@ -51,13 +51,12 @@ public class UserController {
     }
     @RequestMapping("/add")
     @ResponseBody
-    public boolean addUser(@Param("name") String name, @Param("age") int age, @Param("id") int id) {
+    public boolean addUser(@Param("name") String name, @Param("age") int age) {
         String sql = SQLQuery.insertBuilder()
                 .insertInto("user")
                 .assign(SQLQuery.assginmentBuilder()
                         .assign("name", "'".concat(name).concat("'"))
                         .assign("age", String.valueOf(age))
-                        .assign("id", String.valueOf(id))
                         .build())
                 .build();
         return userMapper.executeAddQuery(sql);

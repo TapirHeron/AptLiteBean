@@ -4,6 +4,7 @@ import com.tapirheron.spring.framework.ApplicationContext;
 import com.tapirheron.spring.framework.Autowired;
 import com.tapirheron.spring.framework.BeanPostProcessor;
 import com.tapirheron.spring.framework.Componet;
+import com.tapirheron.spring.framework.Order;
 import com.tapirheron.spring.framework.PostConstruct;
 import com.tapirheron.spring.mvc.returns.type.handler.WebFilter;
 import jakarta.servlet.ServletException;
@@ -15,12 +16,15 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import com.tapirheron.spring.dao.MySqlSessionFactory;
 
 /**
  * 请求分发Servlet，负责处理所有HTTP请求并分发给相应的处理器
@@ -41,7 +45,6 @@ public class DispatcherServlet extends HttpServlet implements BeanPostProcessor 
      * 处理器映射表，存储URL与处理器的映射关系
      */
     private final Map<String, WebHandler> handlerMap = new HashMap<>();
-
     /**
      * 过滤器列表
      */
@@ -61,6 +64,7 @@ public class DispatcherServlet extends HttpServlet implements BeanPostProcessor 
     public void initChain() {
         filters = applicationContext.getBeans(Filter.class);
     }
+
 
     /**
      * 处理HTTP请求
@@ -100,8 +104,27 @@ public class DispatcherServlet extends HttpServlet implements BeanPostProcessor 
             Method invokeMethod = handler.getInvokeMethod();
             // 判断事务处理
             if (invokeMethod.isAnnotationPresent(Transactionnal.class)) {
-                synchronized (invokeMethod) {
+
+                try {
+                    Connection connection = getConnection();
+                    connection.setAutoCommit(false);
                     result = invokeMethod.invoke(handler.getControllerBean(), args);
+                    connection.commit();
+                } catch (Exception e) {
+                    try {
+                        Connection connection = getConnection();
+                        connection.rollback();
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    throw new RuntimeException(e);
+               } finally {
+                    try {
+                        Connection connection = getConnection();
+                        connection.setAutoCommit(true);
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             } else {
                 result = invokeMethod.invoke(handler.getControllerBean(), args);
@@ -109,6 +132,14 @@ public class DispatcherServlet extends HttpServlet implements BeanPostProcessor 
             handler.getReturnType().getReturnTypeHandler().handle(result, req, resp);
         } catch (Exception ignore) {}
 
+    }
+    private Connection getConnection() {
+        MySqlSessionFactory mysqlSessionFactory = applicationContext.getBean(MySqlSessionFactory.class);
+        Connection connection = mysqlSessionFactory.getConnection();
+        if (connection == null) {
+            throw new RuntimeException("没有找到数据库连接");
+        }
+        return connection;
     }
 
     /**

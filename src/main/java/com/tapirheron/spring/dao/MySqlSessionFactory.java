@@ -4,6 +4,7 @@ import com.tapirheron.spring.framework.Autowired;
 import com.tapirheron.spring.framework.Componet;
 import com.tapirheron.spring.framework.Order;
 import com.tapirheron.spring.framework.PostConstruct;
+import com.tapirheron.spring.mvc.DispatcherServlet;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import java.lang.reflect.Proxy;
@@ -38,7 +39,7 @@ public class MySqlSessionFactory {
         this.connection = DriverManager.getConnection(databaseConfig.getUrl(),
                 databaseConfig.getUsername(),
                 databaseConfig.getPassword());
-        log.info("初始化MySqlSessionFactory{}", connection == null);
+        log.info("初始化MySqlSessionFactory持有的connection{}", connection);
     }
 
 }
